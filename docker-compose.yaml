@@ -1,0 +1,59 @@
+services:
+  length-exchange:
+    image: anhletuantran/microservices-length-exchange-service:0.0.1-SNAPSHOT
+    mem_limit: 900m
+    ports:
+      - "8000:8000"
+    networks:
+      - new-network
+    depends_on:
+      - service-registry
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411//api/v2/spans
+    
+  length-conversion:
+    image: anhletuantran/microservices-length-conversion-service:0.0.1-SNAPSHOT
+    mem_limit: 900m
+    ports:
+      - "8100:8100"
+    networks:
+      - new-network
+    depends_on:
+      - service-registry
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411//api/v2/spans
+
+  api-gateway:
+    image: anhletuantran/microservices-api-gateway:0.0.1-SNAPSHOT
+    mem_limit: 900m
+    ports:
+      - "8765:8765"
+    networks:
+      - new-network
+    depends_on:
+      - service-registry
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411//api/v2/spans
+
+  service-registry:
+    image: anhletuantran/microservices-service-registry:0.0.1-SNAPSHOT
+    mem_limit: 900m
+    ports:
+      - "8761:8761"
+    networks:
+      - new-network
+
+  zipkin-server:
+    image: anhletuantran/microservices-zipkin:2.23
+    mem_limit: 500m
+    ports:
+      - "9411:9411"
+    networks:
+      - new-network
+    restart: always
+
+networks:
+  new-network:  
